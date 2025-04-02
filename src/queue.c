@@ -27,11 +27,36 @@ struct pcb_t *dequeue(struct queue_t *q)
 	if (empty(q))
 		return NULL;
 
-	struct pcb_t *p = q->proc[0];
+	struct pcb_t *proc = NULL;
+#ifdef MLQ_SCHED
+	proc = q->proc[0];
 	for (int i = 0; i + 1 < q->size; ++i)
 		q->proc[i] = q->proc[i + 1];
 
 	q->proc[q->size - 1] = NULL;
 	--q->size;
-	return p;
+
+#else
+	int currentPrio = MAX_PRIO;
+	int pos = -1;
+	for (int i = 0; i < q->size; ++i)
+	{
+		if (currentPrio > q->proc[i]->priority)
+		{
+			currentPrio = q->proc[i]->priority;
+			pos = i;
+		}
+	}
+
+	if (pos != -1)
+	{
+		proc = q->proc[pos];
+		for (int i = pos; i < q->size - 1; ++i)
+		{
+			q->proc[i] = q->proc[i + 1];
+		}
+	}
+#endif
+
+	return proc;
 }
