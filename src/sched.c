@@ -96,7 +96,7 @@ void put_mlq_proc(struct pcb_t *proc)
 {
 	pthread_mutex_lock(&queue_lock);
 	// remove from running list
-	removeFromRun(&running_list, proc);
+	removeFromQueue(&running_list, proc);
 	// add to ready queue
 	enqueue(&mlq_ready_queue[proc->prio], proc);
 	pthread_mutex_unlock(&queue_lock);
@@ -159,7 +159,7 @@ void put_proc(struct pcb_t *proc)
 	pthread_mutex_lock(&queue_lock);
 	// enqueue(&run_queue, proc);
 	enqueue(&ready_queue, proc);
-	removeFromRun(&running_list, proc);
+	removeFromQueue(&running_list, proc);
 	pthread_mutex_unlock(&queue_lock);
 }
 

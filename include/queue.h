@@ -17,7 +17,7 @@ struct pcb_t * dequeue(struct queue_t * q);
 
 int empty(struct queue_t * q);
 // support for syscall
-void removeFromRun(struct queue_t *q, struct pcb_t *proc);
+void removeFromQueue(struct queue_t *q, struct pcb_t *proc);
 
 #endif
 
