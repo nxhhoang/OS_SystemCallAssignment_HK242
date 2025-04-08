@@ -33,9 +33,6 @@ struct pcb_t *dequeue(struct queue_t *q)
 	for (int i = 0; i + 1 < q->size; ++i)
 		q->proc[i] = q->proc[i + 1];
 
-	q->proc[q->size - 1] = NULL;
-	--q->size;
-
 #else
 	int currentPrio = MAX_PRIO;
 	int pos = -1;
@@ -57,6 +54,31 @@ struct pcb_t *dequeue(struct queue_t *q)
 		}
 	}
 #endif
-
+	q->proc[q->size - 1] = NULL;
+	--q->size;
 	return proc;
+}
+
+void removeFromQueue(struct queue_t *q, struct pcb_t *proc)
+{
+	if (empty(q))
+		return;
+
+	int found = -1;
+	for (int i = 0; i < q->size; i++)
+	{
+		if (q->proc[i] == proc)
+		{
+			found = -1;
+			break;
+		}
+	}
+
+	// remove found
+	for (int i = found; i < q->size - 1; ++i)
+	{
+		q->proc[i] = q->proc[i + 1];
+	}
+	q->size--;
+	q->proc[q->size] = NULL;
 }
