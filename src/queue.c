@@ -69,11 +69,12 @@ void removeFromQueue(struct queue_t *q, struct pcb_t *proc)
 	{
 		if (q->proc[i] == proc)
 		{
-			found = -1;
+			found = i;
 			break;
 		}
 	}
-
+	if (found == -1)
+		return;
 	// remove found
 	for (int i = found; i < q->size - 1; ++i)
 	{
