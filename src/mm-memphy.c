@@ -137,6 +137,8 @@ int MEMPHY_format(struct memphy_struct *mp, int pagesz)
       fst = newfst;
    }
 
+   mp->used_fp_list = NULL;
+
    return 0;
 }
 
@@ -153,6 +155,13 @@ int MEMPHY_get_freefp(struct memphy_struct *mp, int *retfpn)
    /* MEMPHY is iteratively used up until its exhausted
     * No garbage collector acting then it not been released
     */
+   struct framephy_struct *tmp = malloc(sizeof(struct framephy_struct));
+   tmp->fp_next = NULL;
+   tmp->fpn = fp->fpn;
+
+   tmp->fp_next = mp->used_fp_list;
+   mp->used_fp_list = tmp;
+
    free(fp);
 
    return 0;
@@ -160,9 +169,16 @@ int MEMPHY_get_freefp(struct memphy_struct *mp, int *retfpn)
 
 int MEMPHY_dump(struct memphy_struct *mp)
 {
-  /*TODO dump memphy contnt mp->storage
+  /*TODO dump memphy content mp->storage
    *     for tracing the memory content
    */
+   for (int i = 0; i < mp->maxsz; i++) {
+      if ((BYTE)mp->storage[i]) {
+         printf("BYTE %08x: %d\n", i, (BYTE)mp->storage[i]);
+      }
+   }
+
+   
    return 0;
 }
 
