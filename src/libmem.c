@@ -55,14 +55,30 @@ int enlist_vm_freerg_list(struct mm_struct *mm, struct vm_rg_struct *rg_elmt)
       // }
       *rg_node = rg_elmt;
       (*rg_node)->rg_next = tmp;
-      return 0;
+      break;
     }
     rg_node = &((*rg_node)->rg_next);
   }
 
-  *rg_node = rg_elmt;
+  if (!(*rg_node)) *rg_node = rg_elmt;
+  
+  if (!mm->mmap->vm_freerg_list->rg_next) return 0;
 
+  struct vm_rg_struct *node = mm->mmap->vm_freerg_list->rg_next->rg_next;
+  struct vm_rg_struct *pre = mm->mmap->vm_freerg_list->rg_next;
 
+  while (node) {
+    if (pre->rg_end == node->rg_start) {
+      pre->rg_end = node->rg_end;
+      pre->rg_next = node->rg_next;
+      free(node);
+      node = pre->rg_next;
+    }
+    else {
+      pre = node;
+      node = node->rg_next;
+    }
+  }
 
   return 0;
 }
@@ -209,10 +225,15 @@ int liballoc(struct pcb_t *proc, uint32_t size, uint32_t reg_index)
   printf("===== PHYSICAL MEMORY AFTER ALLOCATION =====\n");
   printf("PID=%d - Region= %d - Address=%08x - Size=%d byte\n", proc->pid, reg_index, addr, size);
 #ifdef PAGETBL_DUMP
-  // print_list_vma(proc->mm->mmap);
-  // print_list_rg(proc->mm->mmap->vm_freerg_list);
-  // print_list_pgn(proc->mm->fifo_pgn);
-  // print_list_fp(proc->mram->used_fp_list);
+  print_list_vma(proc->mm->mmap);
+  print_list_rg(proc->mm->mmap->vm_freerg_list);
+  print_list_pgn(proc->mm->fifo_pgn);
+  print_list_fp(proc->mram->used_fp_list);
+
+  // for (int i = 0; i < PAGING_MAX_SYMTBL_SZ; i++) {
+  //   printf("%d : (%d , %d)\n", i, proc->mm->symrgtbl[i].rg_start, proc->mm->symrgtbl[i].rg_end);
+  // }
+
   // print_list_fp(proc->mram->free_fp_list);
   print_pgtbl(proc, 0, -1); //print max TBL
   printf("================================================================\n");
@@ -237,9 +258,14 @@ int libfree(struct pcb_t *proc, uint32_t reg_index)
   printf("===== PHYSICAL MEMORY AFTER DEALLOCATION =====\n");
   printf("PID=%d - Region= %d\n", proc->pid, reg_index);
 #ifdef PAGETBL_DUMP
-// print_list_vma(proc->mm->mmap);
-// print_list_rg(proc->mm->mmap->vm_freerg_list);
-// print_list_pgn(proc->mm->fifo_pgn);
+print_list_vma(proc->mm->mmap);
+print_list_rg(proc->mm->mmap->vm_freerg_list);
+print_list_pgn(proc->mm->fifo_pgn);
+
+// for (int i = 0; i < PAGING_MAX_SYMTBL_SZ; i++) {
+//   printf("%d : (%d , %d)\n", i, proc->mm->symrgtbl[i].rg_start, proc->mm->symrgtbl[i].rg_end);
+// }
+
 // print_list_fp(proc->mram->free_fp_list);
   print_pgtbl(proc, 0, -1); //print max TBL
   printf("================================================================\n");
@@ -474,7 +500,6 @@ int __write(struct pcb_t *caller, int vmaid, int rgid, int offset, BYTE value)
     return -1;
 
   pg_setval(caller->mm, currg->rg_start + offset, value, caller);
-
   return 0;
 }
 
@@ -590,8 +615,15 @@ int get_free_vmrg_area(struct pcb_t *caller, int vmaid, int size, struct vm_rg_s
     {
 
       newrg->rg_start = (*rgit)->rg_start;
-      newrg->rg_end = (*rgit)->rg_end;
-      *rgit = (*rgit)->rg_next;
+      // newrg->rg_end = (*rgit)->rg_end;
+      newrg->rg_end = newrg->rg_start + size;
+
+      if (newrg->rg_end == (*rgit)->rg_end) {
+        *rgit = (*rgit)->rg_next;
+      }
+      else {
+        (*rgit)->rg_start = newrg->rg_end;
+      }
 
       return 0;
     }
