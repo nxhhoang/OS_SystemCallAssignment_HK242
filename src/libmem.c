@@ -56,6 +56,7 @@ int enlist_vm_freerg_list(struct mm_struct *mm, struct vm_rg_struct *rg_elmt)
       *rg_node = rg_elmt;
       (*rg_node)->rg_next = tmp;
       break;
+  
     }
     rg_node = &((*rg_node)->rg_next);
   }
