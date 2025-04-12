@@ -24,3 +24,4 @@ int libfree(struct pcb_t *, uint32_t);
 int libread(struct pcb_t*, uint32_t, uint32_t, uint32_t*);
 int libwrite(struct pcb_t*, BYTE, uint32_t, uint32_t);
 int pg_setval(struct mm_struct *mm, int addr, BYTE value, struct pcb_t *caller);
+int free_pcb_memph(struct pcb_t *caller);
