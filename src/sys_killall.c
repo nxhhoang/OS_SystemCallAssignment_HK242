@@ -107,11 +107,11 @@
              p->pc=-1;
             free_pcb_memph(p);
             removeFromQueue(caller->ready_queue,p);
-            printf("3. The procname retrieved from memregionid %d is \"%s\"\n", memrg, proc_name);
+          
          }
      }
  #endif
-      
+  pthread_mutex_unlock(&queue_lock);    
  
      return 0; 
  }
