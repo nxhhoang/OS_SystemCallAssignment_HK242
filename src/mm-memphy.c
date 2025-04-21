@@ -172,12 +172,13 @@ int MEMPHY_dump(struct memphy_struct *mp)
   /*TODO dump memphy content mp->storage
    *     for tracing the memory content
    */
+  printf("===== PHYSICAL MEMORY DUMP =====\n");
    for (int i = 0; i < mp->maxsz; i++) {
       if ((BYTE)mp->storage[i]) {
          printf("BYTE %08x: %d\n", i, (BYTE)mp->storage[i]);
       }
    }
-
+   printf("===== PHYSICAL MEMORY END-DUMP =====\n");
    
    return 0;
 }
