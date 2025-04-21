@@ -80,7 +80,6 @@ int validate_overlap_vm_area(struct pcb_t *caller, int vmaid, int vmastart, int 
   {
     if (vmastart < vma->vm_start && vmaend > vma->vm_start)
       return -1;
-    
     vma = vma->vm_next;
   }
   return 0;

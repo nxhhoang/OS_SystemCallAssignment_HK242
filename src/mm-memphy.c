@@ -155,14 +155,9 @@ int MEMPHY_get_freefp(struct memphy_struct *mp, int *retfpn)
    /* MEMPHY is iteratively used up until its exhausted
     * No garbage collector acting then it not been released
     */
-   struct framephy_struct *tmp = malloc(sizeof(struct framephy_struct));
-   tmp->fp_next = NULL;
-   tmp->fpn = fp->fpn;
-
-   tmp->fp_next = mp->used_fp_list;
-   mp->used_fp_list = tmp;
-
-   free(fp);
+   // free(fp);
+   fp->fp_next = mp->used_fp_list;
+   mp->used_fp_list = fp;
 
    return 0;
 }

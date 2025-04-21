@@ -109,6 +109,7 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
             free_pcb_memph(p);
             removeFromQueue(caller->ready_queue, p);
         }
+    }
 #endif
     pthread_mutex_unlock(&queue_lock); 
     return 0;
