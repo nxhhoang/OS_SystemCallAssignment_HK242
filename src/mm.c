@@ -157,6 +157,7 @@ int alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_struc
 
     }
     else { // TODO: ERROR CODE of obtaining somes but not enough frames
+      return -3000;
       int swpfgn;
       uint32_t *vicpte = 0;
 
