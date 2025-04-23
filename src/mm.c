@@ -101,17 +101,17 @@ int vmap_page_range(struct pcb_t *caller,           // process call
    *      in page table caller->mm->pgd[]
    */
 
-    while (fpit != NULL && pgit < pgnum) {
+  while (fpit != NULL && pgit < pgnum) {
 
-      uint32_t *pte = &caller->mm->pgd[pgn + pgit];
+    uint32_t *pte = &caller->mm->pgd[pgn + pgit];
 
-      pte_set_fpn(pte, fpit->fpn);
+    pte_set_fpn(pte, fpit->fpn);
 
-      enlist_pgn_node(&caller->mm->fifo_pgn, pgn + pgit);
+    enlist_pgn_node(&caller->mm->fifo_pgn, pgn + pgit);
 
-      fpit = fpit->fp_next;
-      pgit++;
-    }
+    fpit = fpit->fp_next;
+    pgit++;
+  }
 
     ret_rg->rg_end = addr + pgit * PAGING_PAGESZ;
 
@@ -272,6 +272,7 @@ int init_mm(struct mm_struct *mm, struct pcb_t *caller)
   struct vm_area_struct *vma0 = malloc(sizeof(struct vm_area_struct));
 
   mm->pgd = malloc(PAGING_MAX_PGN * sizeof(uint32_t));
+  mm->fifo_pgn = NULL;
 
   /* By default the owner comes with at least one vma */
   vma0->vm_id = 0;
@@ -280,6 +281,7 @@ int init_mm(struct mm_struct *mm, struct pcb_t *caller)
   vma0->sbrk = vma0->vm_start;
   struct vm_rg_struct *first_rg = init_vm_rg(vma0->vm_start, vma0->vm_end);
   enlist_vm_rg_node(&vma0->vm_freerg_list, first_rg);
+  vma0->vm_freerg_list->rg_next = NULL;
 
   /* TODO update VMA0 next */
   vma0->vm_next = 0;

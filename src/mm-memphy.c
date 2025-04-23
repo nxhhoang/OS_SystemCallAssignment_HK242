@@ -84,6 +84,7 @@ int MEMPHY_seq_write(struct memphy_struct *mp, int addr, BYTE value)
       return -1; /* Not compatible mode for sequential read */
 
    MEMPHY_mv_csr(mp, addr);
+   if (addr < 0 || addr >= mp->maxsz) return -1;
    mp->storage[addr] = value;
 
    return 0;
@@ -99,8 +100,9 @@ int MEMPHY_write(struct memphy_struct *mp, int addr, BYTE data)
 {
    if (mp == NULL)
       return -1;
-
-   if (mp->rdmflg)
+   if (mp->storage == NULL) 
+      return -1;
+   if (mp->rdmflg && addr < mp->maxsz)
       mp->storage[addr] = data;
    else /* Sequential access device */
       return MEMPHY_seq_write(mp, addr, data);

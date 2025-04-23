@@ -32,7 +32,7 @@ static pthread_mutex_t mmvm_lock = PTHREAD_MUTEX_INITIALIZER;
 int enlist_vm_freerg_list(struct mm_struct *mm, struct vm_rg_struct *rg_elmt)
 {
   struct vm_rg_struct **rg_node = &mm->mmap->vm_freerg_list;
-
+  rg_elmt->rg_next = NULL;
   while (*rg_node) 
   {
     if (rg_elmt->rg_start < (*rg_node)->rg_end) 
