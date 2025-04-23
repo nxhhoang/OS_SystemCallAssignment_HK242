@@ -53,7 +53,8 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
     struct pcb_t *p;
     pthread_mutex_lock(&queue_lock);
     const char *filename;
-    for (int i = 0; i < caller->running_list->size; i++)
+    int a = caller->running_list->size;
+    for (int i = 0; i < a; i++)
     {
         p = caller->running_list->proc[i];
         filename = strrchr(p->path, '/');
@@ -63,9 +64,11 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
             filename = p->path;
         if (strcmp(filename, proc_name) == 0)
         {
-            p->pc = -1;
+            p->pc = p->code->size;
             free_pcb_memph(p);
             removeFromQueue(caller->running_list, p);
+            a--;
+            i--;
         }
     }
 
@@ -74,8 +77,8 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
     for (int prio = 0; prio < caller->prio; prio++)
     {
         struct queue_t *q = &caller->mlq_ready_queue[prio];
-
-        for (int k = 0; k < q->size; k++)
+        a= q->size;
+        for (int k = 0; k < a; k++)
         {
             p = q->proc[k];
 
@@ -90,10 +93,13 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
                 p->pc = -1;
                 free_pcb_memph(p);
                 removeFromQueue(q, p);
+                a--;
+                k--;
             }
         }
     }
 #else
+    a=caller->ready_queue->size;
     for (int j = 0; j < caller->ready_queue->size; j++)
     {
         p = caller->ready_queue->proc[j];
@@ -108,6 +114,8 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
             p->pc = -1;
             free_pcb_memph(p);
             removeFromQueue(caller->ready_queue, p);
+            a--;
+            j--;
         }
     }
 #endif
