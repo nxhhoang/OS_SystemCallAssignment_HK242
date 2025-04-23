@@ -12,8 +12,8 @@
 
 int __sys_listsyscall(struct pcb_t *caller, struct sc_regs* reg)
 {
-   for (int i = 0; i < syscall_table_size; i++)
-       printf("%s\n",sys_call_table[i]); 
+    for (int i = 0; i < syscall_table_size; i++)
+        printf("%s\n",sys_call_table[i]); 
 
-   return 0;
+    return 0;
 }
