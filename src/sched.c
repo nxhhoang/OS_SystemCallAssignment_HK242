@@ -54,29 +54,37 @@ struct pcb_t *get_mlq_proc(void)
 	struct pcb_t *proc = NULL;
 	/*TODO: get a process from PRIORITY [ready_queue].
 	 * Remember to use lock to protect the queue.
-	 */
-
+	 * */
 	pthread_mutex_lock(&queue_lock);
-	static int i = 0;
 	int flag = 0;
+	int i = 0;
 	for (;; i = (i + 1) % MAX_PRIO)
 	{
+		// not have slot in cpu
 		if (slot[i] == 0)
 		{
 			slot[i] = MAX_PRIO - i;
 			flag = 0;
 			continue;
 		}
+
+		// queue is empty
 		if (empty(&mlq_ready_queue[i]))
 		{
 			++flag;
+			// all queue is empty
 			if (flag == MAX_PRIO)
 				break;
 			continue;
 		}
+
 		flag = 0;
-		--slot[i];
 		proc = dequeue(&mlq_ready_queue[i]);
+		if (proc)
+		{
+			enqueue(&running_list, proc);
+		}
+		--slot[i];
 		break;
 	}
 
@@ -84,6 +92,7 @@ struct pcb_t *get_mlq_proc(void)
 
 	return proc;
 }
+
 
 void put_mlq_proc(struct pcb_t *proc)
 {

@@ -39,6 +39,7 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
     }
     printf("The procname retrieved from memregionid %d is \"%s\"\n", memrg, proc_name);
 
+
     /* TODO: Traverse proclist to terminate the proc
      *       stcmp to check the process match proc_name
      */
@@ -56,6 +57,7 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
     int a = caller->running_list->size;
     for (int i = 0; i < a; i++)
     {
+       
         p = caller->running_list->proc[i];
         filename = strrchr(p->path, '/');
         if (filename)
@@ -74,7 +76,7 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
 
     // Duyệt running_list
 #ifdef MLQ_SCHED
-    for (int prio = 0; prio < caller->prio; prio++)
+    for (int prio = 0; prio < 140; prio++)
     {
         struct queue_t *q = &caller->mlq_ready_queue[prio];
         a= q->size;
@@ -89,7 +91,7 @@ int __sys_killall(struct pcb_t *caller, struct sc_regs *regs)
                 filename = p->path;
 
             if (strcmp(filename, proc_name) == 0)
-            {
+            {   
                 p->pc = -1;
                 free_pcb_memph(p);
                 removeFromQueue(q, p);
