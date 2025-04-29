@@ -133,6 +133,8 @@ static void * ld_routine(void * args) {
 		add_proc(proc);
 		free(ld_processes.path[i]);
 		i++;
+		if (i < num_processes && ld_processes.start_time[i] == current_time())
+			continue;
 		next_slot(timer_id);
 	}
 	free(ld_processes.path);
